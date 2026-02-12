@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +31,9 @@ public class TasksController {
 	@GetMapping("/{taskId}")
 	public ResponseEntity<HashMap<String, Object>> retriveTaskById(@PathVariable int taskId) {
 		HashMap<String, Object> response = new HashMap<>();
-		TasksEntity task = taskService.fetchTaskById(taskId);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentUserName = authentication.getName();
+		TasksEntity task = taskService.fetchTaskById(taskId, currentUserName);
 		
 		if(task!=null) {
 			response.put("task", task);
@@ -43,15 +48,21 @@ public class TasksController {
 	
 	@GetMapping
 	public ResponseEntity<List<TasksEntity>> retrieveAllTasks() {
-		List<TasksEntity> tasks = taskService.fetchTasks();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentUserName = authentication.getName();
+		System.out.println("TasksController: retrieveAllTasks called for user: " + currentUserName);
+		
+		List<TasksEntity> tasks = taskService.fetchTasks(currentUserName);
 		return ResponseEntity.ok(tasks);
 	}
 	
 	@PostMapping
 	public ResponseEntity<HashMap<String, Object>> createTask(@RequestBody TasksEntity task) {
 		HashMap<String, Object> response = new HashMap<>();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentUserName = authentication.getName();
 		try {
-			TasksEntity newTask = taskService.addTask(task);
+			TasksEntity newTask = taskService.addTask(task, currentUserName);
 			if(newTask!=null) {
 				response.put("message", "Task is created successfully");
 				response.put("task id", newTask.getTaskId());
@@ -73,6 +84,7 @@ public class TasksController {
 	@PutMapping("/{taskId}")
 	public ResponseEntity<HashMap<String, Object>> modifyTask(@RequestBody TasksEntity updatedTask, @PathVariable int taskId) {
 		HashMap<String, Object> response = new HashMap<>();
+
 		try {
 			TasksEntity task = taskService.updateTask(updatedTask, taskId);
 			if(task!=null) {
@@ -96,8 +108,11 @@ public class TasksController {
 	@DeleteMapping("/{taskId}")
 	public ResponseEntity<HashMap<String, Object>> removeTask(@PathVariable int taskId) {
 		HashMap<String, Object> response = new HashMap<>();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentUserName = authentication.getName();
+		
 		try {
-			int status = taskService.deleteTask(taskId);
+			int status = taskService.deleteTask(taskId, currentUserName);
 			if(status==0) {
 				response.put("message", "Task is deleted successfully");
 				response.put("task id", taskId);

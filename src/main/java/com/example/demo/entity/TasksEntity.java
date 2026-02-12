@@ -9,7 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "todolisttasks")
@@ -29,6 +31,7 @@ public class TasksEntity {
 	private int userId;
 	
 	@NotBlank(message = "Title must not be blank")
+	@Size(max = 50, message = "Max length of title is 50 chars")
 	private String title;
 	private String description;
 	
@@ -36,6 +39,7 @@ public class TasksEntity {
 	private TaskStatus status;
 	
 	@Column(name = "duedate")
+	@Future(message = "Due date must be in the future")
 	private LocalDateTime  dueDate;
 	@Column(name = "createdat")
 	private LocalDateTime  createdAt;

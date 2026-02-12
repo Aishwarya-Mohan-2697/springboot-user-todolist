@@ -38,5 +38,6 @@ public class AuthEntity {
 		this.userpassword = userpassword;
 		this.usertaskrole = usertaskrole;
 	}
-
+	
+	
 }

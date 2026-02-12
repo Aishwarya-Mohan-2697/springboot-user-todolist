@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,9 +20,11 @@ public class UserEntity {
 	private int userId;
 	
 	@NotBlank(message = "Name must not be blank")
+	@Column(name = "username", length=30, nullable = false, unique=true)
 	private String userName;
 	
 	@Email(message = "Email format is invalid")
+	@Column(name = "email", length = 255)
 	private String email;
 	private Date createdDate;
 	private Date updatedDate;
